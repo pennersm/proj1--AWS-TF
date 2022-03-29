@@ -12,30 +12,33 @@ provider "aws" {
   shared_config_files      = ["${var.myawsconf}"]
   shared_credentials_files = ["${var.myawscreds}"]
   profile                  = var.myawsprof
+  alias                    = "region"
+  default_tags {
+    tags = {
+      Source   = "${var.sourcerepo}"
+      Pipeline = "${var.CIPipeline}"
+      Name     = "proj1"
+    }
+  }
 }
-resource "aws_key_pair" "def_key" {
-  key_name   = "def_key"
-  public_key = var.def_key_path
+data "aws_region" "current" {
+  provider = aws.region
+}
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair
+# ... and note in above: aws provider does not create-new but require-existing key file
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair
+# a) create a new pair according to aws spec
+# b) paste the pub-key directly into a var and dont use file-path (give format errors)
+# c) this keypair obviously is NEW to AWS and not already imported or generated in console
+resource "aws_key_pair" "proj1_key" {
+  provider   = aws.region
+  key_name   = "id_proj1"
+  public_key = var.def_pub_key
 }
 #-------------------------------------------------
-# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity
-#
-data "aws_caller_identity" "current" {}
-
-output "account_id" {
-  value = data.aws_caller_identity.current.account_id
-}
-
-output "caller_arn" {
-  value = data.aws_caller_identity.current.arn
-}
-
-output "caller_user" {
-  value = data.aws_caller_identity.current.user_id
-}
-#---------------------------------------------------
 # 1. Create VPC
 resource "aws_vpc" "proj1_vpc" {
+  provider             = aws.region
   cidr_block           = var.vpcidrblock
   instance_tenancy     = "default"
   enable_dns_support   = "true"
@@ -43,7 +46,7 @@ resource "aws_vpc" "proj1_vpc" {
   enable_classiclink   = "false"
 
   tags = {
-    Name = "proj1-vpc"
+    Name = "aws:vpc-${var.vpcidrblock}"
   }
 }
 # 2. Add subnet to VPC
@@ -52,15 +55,12 @@ resource "aws_subnet" "proj1_subnet" {
   cidr_block        = var.subnetblock
   availability_zone = "${var.myawsregion}a"
   tags = {
-    Name = "proj1-subnet"
+    Name = "aws:subnet-${var.subnetblock}"
   }
 }
 # 3. Add IGW to VPC
 resource "aws_internet_gateway" "proj1_igw" {
   vpc_id = aws_vpc.proj1_vpc.id
-  tags = {
-    Name = "proj1-igw"
-  }
 }
 # 4. Add default route via IGW to VPC
 resource "aws_route_table" "proj1_routes" {
@@ -68,9 +68,6 @@ resource "aws_route_table" "proj1_routes" {
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.proj1_igw.id
-  }
-  tags = {
-    Name = "proj1-defrt"
   }
 }
 # 5. connect IGW-routes and Subnet
@@ -113,24 +110,21 @@ resource "aws_security_group" "proj1_sg" {
 resource "aws_instance" "project1_inst" {
   ami                         = var.aws_ami
   instance_type               = var.aws_instype
-  key_name                    = aws_key_pair.def_key.id
+  key_name                    = aws_key_pair.proj1_key.id
   vpc_security_group_ids      = ["${aws_security_group.proj1_sg.id}"]
   subnet_id                   = aws_subnet.proj1_subnet.id
   availability_zone           = "${var.myawsregion}a"
   associate_public_ip_address = true
-  tags = {
-    Name = "Project-1-EC2"
-  }
 }
+# 8. Create a hosts file for ansible
 
-output "instance-private-ip" {
-  value = aws_instance.project1_inst.private_ip
+resource "local_file" "ansible_inventory" {
+  content = templatefile("${path.module}/ansible/inventory.tmpl",
+    { ec2pubip = aws_instance.project1_inst.public_ip }
+  )
+  filename        = "${path.module}/ansible/hosts"
+  file_permission = "0644"
 }
-
-output "instance-public-ip" {
-  value = aws_instance.project1_inst.public_ip
-}
-
 
 
 

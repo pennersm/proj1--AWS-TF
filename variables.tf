@@ -7,11 +7,17 @@ variable "myawscreds" {
 variable "myawsprof" {
   default = "pennersm"
 }
-variable "def_key_path" {
-  default = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDTSQgnwos67EGuts4Cv4dLusCdoTcg21HQRSay3qn62ERdfBiq2JKUgf+zj/q+n9YnheY06ioE7jmtln3Cyspk/hFMPvTjphoj7Y8Wt2ftpw6yfszowUIZhhHynixJfnty/QVVUyBXi/w1qmwfeBSB5xvilRgHSrrYQRop2zOiyi24js9O+t9BvEjO1JdbpV2FogI11i5ayNhPgvrzSIdkG/HNLmSzfABFPcQdzFC/LfRQdGh0m80Y3JyR0cOau5eGitrIQd9YnPYbF/2/k0PMgbIhLPRqXATC43fFWXKNSWreFm/gMmUIJpdBYvPxTV6aiQ8F+QrpFD+oPrY6h6ov mpenners@AMSMAC10FNHTDG"
+variable "def_pub_key" {
+  default = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6Fvt5RoVlb+/w+fS38iDG6kvZoT84nbMCNwnL+3jbTrU5F0PY0fYG+DVwMdJuiuLONe9VjqvEwkiinGqyRJGmcc60g3krhPcVSXTP6dtNsAPplmVC9SrrZAyVtdyj3B+CvrWDjFxCsFjzWV2Py0C2j2rioaRZh6JhDCimJBiKEuXZxjh6R8toXut6njOAVoJPfmpBN6TJIY/YZRpw21HCjy7m86kNMb2+laeEBzmqu5Nbw01z5OyNDi9fA0DFlSfahWZ2F1Tx7fWIPILj8pUZnYWofV2lHDAtjEonKDcRdTBOwXg5suJq4JqZIUCWAy52skh0VK2WNpkdM7KUEtlv mpenners@M-C02W10FNHTDG"
 }
 variable "myawsregion" {
   default = "eu-south-1"
+}
+variable "sourcerepo" {
+  default = "devopsTrain-exe1-awstf"
+}
+variable "CIPipeline" {
+  default = "devopsTrain-exe1-cipipe"
 }
 #-----------------------------------
 variable "vpcidrblock" {

@@ -1,0 +1,71 @@
+- name: Install proj1 requirements
+  hosts: proj1_hosts
+  gather_facts: no
+  become: yes
+
+  tasks:
+
+    - name: install ubuntu repo packages
+      apt:
+        name: "{{item}}"
+        state: present
+        update_cache: true
+      loop:
+        - net-tools
+        - openjdk-11-jre-headless
+        - python3
+        - pip
+
+    - name: Configure FW add TCP
+      ufw:
+        rule: allow
+        log: yes
+        port: "{{item}}"
+      loop:
+          - 22
+          - 80
+          - 8080
+
+    - name: Set FW logging
+      ufw:
+        logging: on
+        state: enabled
+
+
+    - name: verify existing Jenkins apt key
+      apt_key:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
+        state: present
+
+    - name: verify Jenkins Repo is added
+      apt_repository:
+        repo: 'deb https://pkg.jenkins.io/debian-stable binary/'
+        state: present
+
+    - name: verify jenkins is installed
+      apt:
+        name: jenkins
+        state: present
+        update_cache: true
+
+    - name: ensure jenkins is running
+      service:
+        name: jenkins
+        state: started
+
+#
+#
+#   - name: install java
+#      apt:
+#        name: "{{java}}"
+#        state: present
+#    - name: install Jenkins
+#      apt:
+#        name: jenkins
+#        state: latest
+
+#    - name: Start jenkins
+#      service:
+#        name: jenkins
+#        enabled: true
+#        state: started
