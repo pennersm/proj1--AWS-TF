@@ -527,7 +527,7 @@ aws_vpc.proj1_vpc: Destroying... [id=vpc-05612df4c222d694d]
 aws_vpc.proj1_vpc: Destruction complete after 0s
 
 Destroy complete! Resources: 10 destroyed.
-``
+```
 
 ### verify the result
 
