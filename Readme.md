@@ -25,6 +25,8 @@ only terraform states to maintain the entire flow including the install
 
 
 ### 3. calling terraform init
+You should expect a similar output:
+
 `[19:04:18][mpenners@M-C02W10FNHTDG][devopsTrain-exe1-awstf]# terraform init`
 ``
 `Initializing the backend...`
@@ -479,6 +481,46 @@ instance-public-ip = "15.160.179.89"
 region_selected = "eu-south-1"
 ```
 `[19:22:48][mpenners@M-C02W10FNHTDG][devopsTrain-exe1-awstf]`
+
+### destroying the deployment
+Due to our "loosely hooked" state synchronisation tf with ansible I suggest you try a few init-to-destroy cycles and check that no nods are created. At the end it should be like this:
+
+```
+
+Do you really want to destroy all resources?
+  Terraform will destroy all your managed infrastructure, as shown above.
+  There is no undo. Only 'yes' will be accepted to confirm.
+
+  Enter a value: yes
+
+shell_script.call_ansible: Destroying... [id=c92u6q2sahsnmsmhfpn0]
+shell_script.call_ansible: Destruction complete after 0s
+local_file.ansible_inventory: Destroying... [id=25837c83dc3c384ffdb5fe78b05b91186a9ab070]
+local_file.ansible_inventory: Destruction complete after 0s
+aws_route_table_association.proj1_public: Destroying... [id=rtbassoc-052688acf112be82e]
+aws_instance.project1_inst: Destroying... [id=i-028fd83911b6fd05c]
+aws_route_table_association.proj1_public: Destruction complete after 0s
+aws_route_table.proj1_routes: Destroying... [id=rtb-03d55edd00954bf79]
+aws_route_table.proj1_routes: Destruction complete after 1s
+aws_internet_gateway.proj1_igw: Destroying... [id=igw-0785e46a6329d63ca]
+aws_instance.project1_inst: Still destroying... [id=i-028fd83911b6fd05c, 10s elapsed]
+aws_internet_gateway.proj1_igw: Still destroying... [id=igw-0785e46a6329d63ca, 10s elapsed]
+aws_instance.project1_inst: Still destroying... [id=i-028fd83911b6fd05c, 20s elapsed]
+aws_internet_gateway.proj1_igw: Still destroying... [id=igw-0785e46a6329d63ca, 20s elapsed]
+aws_internet_gateway.proj1_igw: Destruction complete after 27s
+aws_instance.project1_inst: Still destroying... [id=i-028fd83911b6fd05c, 30s elapsed]
+aws_instance.project1_inst: Destruction complete after 30s
+aws_key_pair.proj1_key: Destroying... [id=id_proj1]
+aws_subnet.proj1_subnet: Destroying... [id=subnet-070b4b78b5c6cef7b]
+aws_security_group.proj1_sg: Destroying... [id=sg-086425972361b6ded]
+aws_key_pair.proj1_key: Destruction complete after 1s
+aws_security_group.proj1_sg: Destruction complete after 1s
+aws_subnet.proj1_subnet: Destruction complete after 1s
+aws_vpc.proj1_vpc: Destroying... [id=vpc-05612df4c222d694d]
+aws_vpc.proj1_vpc: Destruction complete after 0s
+
+Destroy complete! Resources: 10 destroyed.
+``
 
 ### verify the result
 
