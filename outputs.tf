@@ -27,3 +27,18 @@ output "EC2_selected" {
   value = data.aws_region.current.endpoint
 }
 #---------------------------------------------------
+output "ANSIBLE_PRIVATE_KEY_FILE" {
+  value = var.ansible_privkey
+}
+output "ANSIBLE_LOG_PATH" {
+  value = var.ansible_log
+}
+output "ANSIBLE_REMOTE_USER" {
+  value = var.ami_user
+}
+output "ANSIBLE_INVENTORY" {
+  value = var.ansible_hosts
+}
+output "ansible_tf_statfile" {
+  value = var.ansible_tf_statfile
+}

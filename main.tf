@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 4.0"
     }
+    shell = {
+      source  = "scottwinkler/shell"
+      version = "~> 1.0"
+    }
   }
 }
 # Configure the AWS Provider
@@ -28,7 +32,7 @@ data "aws_region" "current" {
 # ... and note in above: aws provider does not create-new but require-existing key file
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair
 # a) create a new pair according to aws spec
-# b) paste the pub-key directly into a var and dont use file-path (give format errors)
+# b) paste the pub-key directly into a var and dont use file-path (would give format errors)
 # c) this keypair obviously is NEW to AWS and not already imported or generated in console
 resource "aws_key_pair" "proj1_key" {
   provider   = aws.region
@@ -117,37 +121,50 @@ resource "aws_instance" "project1_inst" {
   associate_public_ip_address = true
 }
 # 8. Create a hosts file for ansible
-
+# but this way doesnt scale inventory groups and is ugly - can be done better:
+# https://github.com/habakke/terraform-provider-ansible/blob/main/README.md
 resource "local_file" "ansible_inventory" {
+  depends_on = [aws_instance.project1_inst]
   content = templatefile("${path.module}/ansible/inventory.tmpl",
     { ec2pubip = aws_instance.project1_inst.public_ip }
   )
-  filename        = "${path.module}/ansible/hosts"
+  filename        = "${path.module}/ansible/${var.ansible_hosts}"
   file_permission = "0644"
 }
+# 9. Run the playbook to install requested SW
+# https://livebook.manning.com/book/terraform-in-action/appendix-d/v-11/14
+resource "shell_script" "call_ansible" {
+  lifecycle_commands {
+    create = <<-EOF
+      cd "${path.module}/ansible/"
+      rc="$(ansible-playbook ${path.module}/${var.ansible_playbook} >/dev/null 2>&1)$?"
+      echo "{\"ansible_playbook_exit_status\": \"$rc\"}" > ${path.module}/${var.ansible_tf_statfile}
+    EOF
+    delete = <<-EOF
+      rm -f "ansible/${var.ansible_log}"
+      rm -f "ansible/${var.ansible_tf_statfile}"
+    EOF
+  }
+  environment = {
+    ANSIBLE_HOST_KEY_CHECKING = "False"
+    ANSIBLE_PRIVATE_KEY_FILE  = var.ansible_privkey
+    ANSIBLE_LOG_PATH          = var.ansible_log
+    ANSIBLE_REMOTE_USER       = var.ami_user
+    ANSIBLE_INVENTORY         = var.ansible_hosts
+  }
+  depends_on = [local_file.ansible_inventory]
+}
+#output "call_ansible" {
+#  value = shell_script.call-ansible.output["ansible_playbook_exit_status"]
+#}
 
-
-
-
-
-
-
-
-
-
-
-# 1. Create an S3 bucket and copy some files on it
-# 2. then create an EC2 instance
-# 3. copy SSH keys for access over to the EC2
-# 4. then start a remote script to do some work
-# 5. leave log of the script on S3 bucket
-
+# Create an S3 bucket and copy some files on it:
 # 1. Create S3 bucket
 # resource "aws_s3_bucket" "project1-bucket" {
 #    bucket = var.bucket_name
 #    acl = var.bucket_acl
 #}
-# upload stuff to the buckets
+# upload stuff to the bucket
 # resource "aws_s3_bucket_object" "upload_to_S3" {
 #  for_each = fileset("uploadS3/", "*")
 #  bucket = aws_s3_bucket.project1-bucket.id

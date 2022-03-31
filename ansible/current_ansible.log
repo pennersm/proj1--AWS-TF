@@ -1,0 +1,24 @@
+2022-03-31 19:20:05,355 p=97159 u=mpenners n=ansible | PLAY [Install proj1 requirements] **********************************************
+2022-03-31 19:20:05,378 p=97159 u=mpenners n=ansible | TASK [Wait timeout seconds for EC2 to have SSH up] *****************************
+2022-03-31 19:20:15,066 p=97159 u=mpenners n=ansible | ok: [15.160.179.89]
+2022-03-31 19:20:15,075 p=97159 u=mpenners n=ansible | TASK [install ubuntu repo packages] ********************************************
+2022-03-31 19:20:32,423 p=97159 u=mpenners n=ansible | changed: [15.160.179.89] => (item=net-tools)
+2022-03-31 19:20:47,123 p=97159 u=mpenners n=ansible | changed: [15.160.179.89] => (item=openjdk-11-jre-headless)
+2022-03-31 19:20:52,313 p=97159 u=mpenners n=ansible | ok: [15.160.179.89] => (item=python3)
+2022-03-31 19:21:24,948 p=97159 u=mpenners n=ansible | changed: [15.160.179.89] => (item=pip)
+2022-03-31 19:21:24,964 p=97159 u=mpenners n=ansible | TASK [Configure FW add TCP] ****************************************************
+2022-03-31 19:21:27,989 p=97159 u=mpenners n=ansible | changed: [15.160.179.89] => (item=22)
+2022-03-31 19:21:30,198 p=97159 u=mpenners n=ansible | changed: [15.160.179.89] => (item=80)
+2022-03-31 19:21:33,234 p=97159 u=mpenners n=ansible | changed: [15.160.179.89] => (item=8080)
+2022-03-31 19:21:33,247 p=97159 u=mpenners n=ansible | TASK [Set FW logging] **********************************************************
+2022-03-31 19:21:37,326 p=97159 u=mpenners n=ansible | changed: [15.160.179.89]
+2022-03-31 19:21:37,333 p=97159 u=mpenners n=ansible | TASK [verify existing Jenkins apt key] *****************************************
+2022-03-31 19:21:40,578 p=97159 u=mpenners n=ansible | changed: [15.160.179.89]
+2022-03-31 19:21:40,585 p=97159 u=mpenners n=ansible | TASK [verify Jenkins Repo is added] ********************************************
+2022-03-31 19:21:51,677 p=97159 u=mpenners n=ansible | changed: [15.160.179.89]
+2022-03-31 19:21:51,684 p=97159 u=mpenners n=ansible | TASK [verify jenkins is installed] *********************************************
+2022-03-31 19:22:42,472 p=97159 u=mpenners n=ansible | changed: [15.160.179.89]
+2022-03-31 19:22:42,480 p=97159 u=mpenners n=ansible | TASK [ensure jenkins is running] ***********************************************
+2022-03-31 19:22:48,299 p=97159 u=mpenners n=ansible | ok: [15.160.179.89]
+2022-03-31 19:22:48,314 p=97159 u=mpenners n=ansible | PLAY RECAP *********************************************************************
+2022-03-31 19:22:48,314 p=97159 u=mpenners n=ansible | 15.160.179.89              : ok=8    changed=6    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   

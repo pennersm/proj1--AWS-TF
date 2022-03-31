@@ -5,6 +5,10 @@
 
   tasks:
 
+    - name: Wait timeout seconds for EC2 to have SSH up
+      wait_for_connection:
+        timeout: 90
+
     - name: install ubuntu repo packages
       apt:
         name: "{{item}}"
