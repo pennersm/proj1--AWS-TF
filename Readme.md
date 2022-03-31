@@ -27,6 +27,36 @@ only terraform states to maintain the entire flow including the install
 ### 3. calling terraform init
 You should expect a similar output:
 ```
+[19:04:18][mpenners@M-C02W10FNHTDG][devopsTrain-exe1-awstf]# terraform init
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Reusing previous version of hashicorp/aws from the dependency lock file
+- Reusing previous version of scottwinkler/shell from the dependency lock file
+- Reusing previous version of hashicorp/local from the dependency lock file
+- Using previously-installed hashicorp/local v2.2.2
+- Using previously-installed hashicorp/aws v4.7.0
+- Using previously-installed scottwinkler/shell v1.7.10
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+[19:04:54][mpenners@M-C02W10FNHTDG][devopsTrain-exe1-awstf]#
+```
+
+
+
+
+### 4. calling terraform plan
+terraform plan will show the resources to be created:
+```
 [19:04:54][mpenners@M-C02W10FNHTDG][devopsTrain-exe1-awstf]# terraform plan
 
 Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
@@ -371,7 +401,7 @@ Changes to Outputs:
 
 Note: You didn't use the -out option to save this plan, so Terraform can't guarantee to take exactly these actions if you run "terraform apply" now.
 [19:05:05][mpenners@M-C02W10FNHTDG][devopsTrain-exe1-awstf]#
-``
+```
 
 ### calling terraform apply
 when you apply the same plan will be presented as in the terraform plan step, because resources have not changed. After the plan is shown, you confirm again with yes to see how it is applied:
@@ -455,8 +485,9 @@ caller_user = "350377495939"
 instance-private-ip = "10.0.2.239"
 instance-public-ip = "15.160.179.89"
 region_selected = "eu-south-1"
+[19:22:48][mpenners@M-C02W10FNHTDG][devopsTrain-exe1-awstf]
 ```
-`[19:22:48][mpenners@M-C02W10FNHTDG][devopsTrain-exe1-awstf]`
+
 
 ### destroying the deployment
 Due to our "loosely hooked" state synchronisation tf with ansible I suggest you try a few init-to-destroy cycles and check that no nods are created. At the end it should be like this:
